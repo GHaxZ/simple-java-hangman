@@ -8,44 +8,40 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Game {
-    private String wordToGuess;
-    private String censoredWord;
-    private int currentLifes;
+    private String wordToGuess; // Stores the word that is supposed to be guessed
+    private String censoredWord; // Stores a censored version of the word that is supposed to be guessed
+    private int currentLifes; //Stores the current amount of lives
+    // Stores all the available word that can get picked for guessing
     private ArrayList<String> words = new ArrayList<>(Arrays.asList("family", "school", "friend", "mother", "father", "doctor", "police", "market", "garden", "library", "camera", "street", "nature", "bicycle", "dinner", "country", "kitchen", "airport", "bedroom", "computer", "hospital", "business", "internet", "vacation", "sandwich", "newspaper", "football", "magazine", "fireplace", "basketball", "vegetable", "furniture", "breakfast", "chocolate", "adventure", "landscape", "passenger", "building", "umbrella", "telephone", "playlist", "education", "furniture", "playlist", "software", "painting", "butterfly", "lipstick", "calendar", "staircase", "perfume", "elevator", "jewelry", "gasoline", "airplane", "medicine", "vacation", "airplane", "architect", "umbrella", "fireworks", "furniture", "playground", "chocolate", "cathedral", "waterfall", "skylight", "magazine", "dinosaur", "classroom", "butterfly", "landscape", "breakfast", "furniture", "champagne", "vegetable", "accessory", "basketball", "masterpiece", "pollution", "furniture", "billboard", "fireplace", "satellite", "orchestra", "spotlight", "telephone", "furniture", "skyscraper", "adventure", "portfolio", "skyscraper", "landscape", "chocolate", "warehouse", "furniture", "helicopter", "medication", "furniture"));
+    // Stores the already guessed words and letters
     private ArrayList<String> alreadyGuessed = new ArrayList<>();
 
     public static void main(String[] args) {
-        Path path = Paths.get("customWords.txt");
-        Game game = new Game(path);
-        game.runGame();
+        Path path = Paths.get("customWords.txt"); // Creates the Path Object for the "customWords.txt" file
+        Game game = new Game(path); // Initializes new Game Object
+        game.runGame(); // Runs the main game loop
     }
 
-    public Game(Path path){ // Creates a new Game Instance.
+    public Game(Path path){ // Creates a new game Instance.
         createFile(path);
         addCustomWords(path);
         pickRandomWord();
         currentLifes = 6;
     }
 
-    private void runGame(){
-        for(String item : words){
-            System.out.println(item);
-        }
-
-        System.out.println(words.contains("testword"));
+    private void runGame(){ // Main Game loop that takes inputs, shows progress, etc.
         System.out.println("\nWelcome to Hangman!\nA random word has been picked.");
         boolean wordGuessed = false;
         while(!wordGuessed) {
-            if(currentLifes == 0){
+            if(currentLifes == 0){ // Checks if the current lives are zero and if so ends the game
                 System.out.println("\n--- You lost! The word was " + wordToGuess + ".");
                 break;
             }
 
-
-
             System.out.println("\nAmount of lifes left: " + currentLifes);
             System.out.println("\nWord to guess: " + censoredWord);
 
+            // Prints the words or characters already guessed
             if(alreadyGuessed.size() != 0){
                 System.out.print("Already guessed: ");
 
@@ -57,12 +53,14 @@ public class Game {
 
             System.out.print("\nEnter a letter or a word to guess: ");
 
-            String guessedString = stringInput().trim();
+            String guessedString = stringInput().trim(); // Takes the user input and stores it in the guessedString variable
 
-            if(guessedString != ""){
-                if(guessedString.length() > 0 && guessedString.length() <= wordToGuess.length()){
+            if(!guessedString.isEmpty()){ // If the user input is not empty
+                // If the user input is either a single letter or a word with the length of the word to guess
+                if(guessedString.length() == 1 || guessedString.length() == wordToGuess.length()){
                     int guessResult = guess(guessedString);
 
+                    // Handles the different cases (word guessed, letter correct, wrong guess, guess already made)
                     if(guessResult == 1){
                         System.out.println("\n--- You guessed the word! It was " + wordToGuess + " ---");
                         wordGuessed = true;
@@ -75,17 +73,18 @@ public class Game {
                         currentLifes--;
                     }
                 } else {
-                    System.err.println("\n[!] Your guess must be longer than 0 and shorter than the words length (=" + wordToGuess.length() + ").");
+                    System.err.println("\n[!] Your guess must be a single letter or the length of the word to guess (=" + wordToGuess.length() + ").");
                 }
             }
         }
 
+        // Lets the player play again if they want to
         while(true){
             System.out.print("\n--- Do you want to play again? (Yes/No): ");
             String userInput = stringInput().toLowerCase();
 
-            if(userInput.equals("yes")){
-                main(null);
+            if(userInput.equals("yes")){ // If yes, the main() method gets called so the game resets and runs again
+                main(null); // "null" because there are no runtime arguments
             } else if(userInput.equals("no")){
                 System.exit(0);
             } else {
@@ -94,13 +93,15 @@ public class Game {
         }
     }
 
-    private void createFile(Path path){ // Creates the customWords.txt file if not already created.
+    // Creates the customWords.txt file if not already created.
+    private void createFile(Path path){
         try {
             Files.createFile(path);
         } catch(IOException e){}
     }
 
-    private void addCustomWords(Path path){ // Adds all the custom words to the ArrayList.
+    // Adds all the custom words to the ArrayList.
+    private void addCustomWords(Path path){
         try {
             List<String> customWords = Files.readAllLines(path);
 
@@ -114,50 +115,58 @@ public class Game {
     }
 
     private void pickRandomWord(){
-        wordToGuess = words.get(ranNum(0, words.size()));
+        wordToGuess = words.get(ranNum(0, words.size())); // Chooses a random word from the words ArrayList as the word to guess
 
         censoredWord = "";
-        for(int x = 0; x < wordToGuess.length(); x++){
+        for(int x = 0; x < wordToGuess.length(); x++){ // Creates the censored word by adding one "-" for each letter of the word to guess
             censoredWord += "-";
         }
     }
 
+    // Handles the guess-taking
     private int guess(String guessedString){
+        // If the letter or word was already guessed returns 2 (already guessed)
         if(alreadyGuessed.contains(guessedString)){
             return 2;
         }
 
-        alreadyGuessed.add(guessedString);
+        alreadyGuessed.add(guessedString); // Adds the word to the alreadyGuessed ArrayList
 
+        // Checks if the guessedString is a word (longer than 1)
         if(guessedString.length() > 1){
-            if(guessedString.equalsIgnoreCase(wordToGuess)){
+            if(guessedString.equalsIgnoreCase(wordToGuess)){ // If guessedString is the word to guess returns 1 (word guessed).
                 return 1;
-            } else {
+            } else { // Else return -1 (wrong guess).
                 return -1;
             }
-        } else {
+        } else { // If the guessedString is not a word (1 character long).
             boolean successfulGuess = false;
-            for(int x = 0; x < wordToGuess.length(); x++){
-                if(guessedString.equalsIgnoreCase(Character.toString(wordToGuess.charAt(x)))){
-                    successfulGuess = true;
+            for(int x = 0; x < wordToGuess.length(); x++){ // Loops through every letter in the word to guess
+                if(guessedString.equalsIgnoreCase(Character.toString(wordToGuess.charAt(x)))){ // If the letter at index x is the guessedString
+                    successfulGuess = true; // Guess was successful
+                    //Replaces the "-" symbol in the censoredWord String at the index x with the letter of the wordToGuess String at the index x
+                    //to be honest I don't really know why this shit works, I asked ChatGPT
                     censoredWord = censoredWord.substring(0, x) + guessedString + censoredWord.substring(x + 1);
                 }
             }
 
-            if(censoredWord.equals(wordToGuess)){
+            // Returns the correct number based on the result of the guess
+            if(censoredWord.equals(wordToGuess)){ // If the censored word is equal to the word to guess return 1 (word guessed)
                 return 1;
-            } else if(successfulGuess) {
+            } else if(successfulGuess) { // If the successfulGuess boolean has been set to true returns 0 (successful guess)
                 return 0;
-            } else {
+            } else { // Else return -1 (guess was wrong)
                 return -1;
             }
         }
     }
 
+    // Generates a random number between the given min and max value
     private int ranNum(int min, int max){
         return (int)(Math.random() * ((max - min) + 1) + min);
     }
 
+    // Handles the String Input
     private String stringInput(){
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
