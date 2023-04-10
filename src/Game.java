@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 public class Game {
     private String wordToGuess; // Stores the word that is supposed to be guessed
     private String censoredWord; // Stores a censored version of the word that is supposed to be guessed
-    private int currentLifes; //Stores the current amount of lives
+    private int currentLives; //Stores the current amount of lives
     // Stores all the available word that can get picked for guessing
     private ArrayList<String> words = new ArrayList<>(Arrays.asList("family", "school", "friend", "mother", "father", "doctor", "police", "market", "garden", "library", "camera", "street", "nature", "bicycle", "dinner", "country", "kitchen", "airport", "bedroom", "computer", "hospital", "business", "internet", "vacation", "sandwich", "newspaper", "football", "magazine", "fireplace", "basketball", "vegetable", "furniture", "breakfast", "chocolate", "adventure", "landscape", "passenger", "building", "umbrella", "telephone", "playlist", "education", "furniture", "playlist", "software", "painting", "butterfly", "lipstick", "calendar", "staircase", "perfume", "elevator", "jewelry", "gasoline", "airplane", "medicine", "vacation", "airplane", "architect", "umbrella", "fireworks", "furniture", "playground", "chocolate", "cathedral", "waterfall", "skylight", "magazine", "dinosaur", "classroom", "butterfly", "landscape", "breakfast", "furniture", "champagne", "vegetable", "accessory", "basketball", "masterpiece", "pollution", "furniture", "billboard", "fireplace", "satellite", "orchestra", "spotlight", "telephone", "furniture", "skyscraper", "adventure", "portfolio", "skyscraper", "landscape", "chocolate", "warehouse", "furniture", "helicopter", "medication", "furniture"));
     // Stores the already guessed words and letters
@@ -26,19 +26,19 @@ public class Game {
         createFile(path);
         addCustomWords(path);
         pickRandomWord();
-        currentLifes = 6;
+        currentLives = 6;
     }
 
     private void runGame(){ // Main Game loop that takes inputs, shows progress, etc.
         System.out.println("\nWelcome to Hangman!\nA random word has been picked.");
         boolean wordGuessed = false;
         while(!wordGuessed) {
-            if(currentLifes == 0){ // Checks if the current lives are zero and if so ends the game
+            if(currentLives == 0){ // Checks if the current lives are zero and if so ends the game
                 System.out.println("\n--- You lost! The word was " + wordToGuess + ".");
                 break;
             }
 
-            System.out.println("\nAmount of lifes left: " + currentLifes);
+            System.out.println("\nAmount of lifes left: " + currentLives);
             System.out.println("\nWord to guess: " + censoredWord);
 
             // Prints the words or characters already guessed
@@ -70,7 +70,7 @@ public class Game {
                         System.out.println("\n--- You already guessed \"" + guessedString + "\". Try something different. ---");
                     } else {
                         System.out.println("\n--- Oops! You guessed wrong. One life less! ---");
-                        currentLifes--;
+                        currentLives--;
                     }
                 } else {
                     System.err.println("\n[!] Your guess must be a single letter or the length of the word to guess (=" + wordToGuess.length() + ").");
@@ -126,7 +126,7 @@ public class Game {
     // Handles the guess-taking
     private int guess(String guessedString){
         // If the letter or word was already guessed returns 2 (already guessed)
-        if(alreadyGuessed.contains(guessedString)){
+        if(alreadyGuessed.contains(guessedString.toLowerCase())){
             return 2;
         }
 
